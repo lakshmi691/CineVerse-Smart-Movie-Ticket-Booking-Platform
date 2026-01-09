@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <title>Cineverse Ultimate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        // Check local storage
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        function toggleTheme() {
+            if (document.documentElement.getAttribute('data-theme') === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar" th:fragment="navbar">
+        <div class="nav-container"
+            style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:1400px; margin:0 auto;">
+            <div class="nav-left">
+                <div class="logo" style="cursor:pointer;" onclick="window.location.href='/'">
+                    <i class="fas fa-crown" style="color:var(--accent-color); margin-right:5px;"></i> CINE<span
+                        style="color:var(--text-primary);">VERSE</span>
+                </div>
+            </div>
+
+            <div class="nav-right" style="display:flex; align-items:center; gap:10px;">
+                <a href="/" class="nav-link-item">Home</a>
+                <a href="/#movies" class="nav-link-item">Browse</a>
+                <th:block th:if="${session.user != null}">
+                    <div class="user-links" style="display:flex; align-items:center; gap:10px;">
+                        <a href="/watchlist" class="nav-link-item">Watchlist</a>
+                        <a href="/my-bookings" class="nav-link-item">Tickets</a>
+                        <a href="/wallet" class="nav-link-item">Wallet</a>
+                        <a href="/profile" class="nav-link-item">Profile</a>
+                    </div>
+
+                    <div class="user-points"
+                        style="color: #ffd700; font-weight: bold; background: rgba(255, 215, 0, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255, 215, 0, 0.3);"
+                        th:if="${session.user.points != null}" title="Loyalty Points">
+                        <i class="fas fa-coins" style="margin-right: 5px;"></i><span
+                            th:text="${session.user.points}">0</span>
+                    </div>
+
+                    <a th:if="${session.user.role=='ADMIN'}" href="/admin" class="admin-link"
+                        style="color:white; background:#ff4d4d; padding:5px 15px; border-radius:20px; font-weight:bold; box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);">
+                        <i class="fas fa-user-shield"></i> Admin Panel
+                    </a>
+
+                    <a href="/logout" style="opacity:0.7; font-size: 1.1rem;"><i class="fas fa-sign-out-alt"></i></a>
+                </th:block>
+
+                <a th:if="${session.user == null}" href="/login" class="btn-primary"
+                    style="margin:0; padding: 8px 15px; font-size: 0.85rem; border-radius: 12px;">Login</a>
+
+                <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1); margin: 0 5px;"></div>
+                <i class="fas fa-adjust theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode"
+                    style="color:var(--accent-color); opacity: 0.8; cursor:pointer;"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-nav-bottom" th:fragment="bottom-nav">
+        <!-- Bottom navigation completely removed -->
+    </div>
+
+    <footer th:fragment="footer"
+        style="padding:50px; text-align:center; color:#555; margin-top:50px; position:relative;">
+        <p>&copy; 2026 Cineverse. Experience the Magic.</p>
+        <div style="margin-top:15px;">
+            <a href="#" onclick="openSupportModal(event)"
+                style="color:var(--text-secondary); text-decoration:none; font-size:0.9rem; border-bottom:1px dashed var(--text-secondary); transition:0.3s;">Help
+                & Support</a>
+        </div>
+
+        <!-- SUPPORT MODAL APP -->
+        <div id="supportModal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:10000; align-items:center; justify-content:center; text-align:left; animation: fadeIn 0.3s;">
+            <div
+                style="background:var(--card-bg); width:700px; max-width:90%; border-radius:20px; border:1px solid var(--glass-border); box-shadow:var(--shadow-premium); overflow:hidden; display:flex; flex-direction:column; max-height:85vh;">
+                <!-- Modal Header -->
+                <div
+                    style="padding:20px 30px; border-bottom:1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2);">
+                    <h2 style="margin:0; font-size:1.5rem; color:white;">Cineverse Support</h2>
+                    <button onclick="closeSupportModal()"
+                        style="background:none; border:none; color:var(--text-secondary); font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
+                <!-- Modal Body -->
+                <div style="padding:30px; overflow-y:auto;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+                        <!-- LEFT: FAQ & Contact Info -->
+                        <div>
+                            <h3 style="color:var(--accent-color); margin-bottom:15px;">Quick Help</h3>
+                            <div class="faq-item" style="margin-bottom:15px;">
+                                <div style="font-weight:600; margin-bottom:5px;">🎫 Booking Failed?</div>
+                                <p style="font-size:0.9rem; color:var(--text-secondary); margin:0;">If money was
+                                    deducted, it will be refunded automatically within 3-5 business days.</p>
+                            </div>
+                            <div class="faq-item" style="margin-bottom:15px;">
+                                <div style="font-weight:600; margin-bottom:5px;">📅 Can I cancel tickets?</div>
+                                <p style="font-size:0.9rem; color:var(--text-secondary); margin:0;">Yes, cancellations
+                                    are allowed up to 4 hours before showtime from the 'My Tickets' section.</p>
+                            </div>
+                            <hr style="border:0; border-top:1px solid var(--glass-border); margin:20px 0;">
+                            <h3 style="color:var(--accent-color); margin-bottom:15px;">Contact Us</h3>
+                            <div
+                                style="display:flex; align-items:center; gap:10px; margin-bottom:10px; color:var(--text-primary);">
+                                <i class="fas fa-phone-alt" style="color:var(--accent-color);"></i>
+                                <span>1800-200-1234</span>
+                            </div>
+                            <div
+                                style="display:flex; align-items:center; gap:10px; margin-bottom:10px; color:var(--text-primary);">
+                                <i class="fas fa-envelope" style="color:var(--accent-color);"></i>
+                                <span>support.india@cineverse.com</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; color:var(--text-primary);">
+                                <i class="fas fa-map-marker-alt" style="color:var(--accent-color);"></i>
+                                <span>Bangalore South, Karnataka, India</span>
+                            </div>
+                        </div>
+                        <!-- RIGHT: Message Form -->
+                        <div
+                            style="background:rgba(255,255,255,0.02); padding:20px; border-radius:15px; border:1px solid var(--glass-border);">
+                            <h3 style="margin-top:0; margin-bottom:15px;">Send a Message</h3>
+                            <input type="text" placeholder="Subject"
+                                style="width:100%; padding:10px; margin-bottom:10px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); color:white; border-radius:8px; outline:none;">
+                            <textarea placeholder="Describe your issue..." rows="5"
+                                style="width:100%; padding:10px; margin-bottom:15px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); color:white; border-radius:8px; outline:none; font-family:inherit;"></textarea>
+                            <button onclick="submitTicket()" class="btn-primary"
+                                style="width:100%; padding:10px; border-radius:8px; cursor:pointer;">Send
+                                Message</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            async function submitTicket() {
+                const subjectInput = document.querySelector('input[placeholder="Subject"]');
+                const messageInput = document.querySelector('textarea[placeholder="Describe your issue..."]');
+
+                const subject = subjectInput.value;
+                const message = messageInput.value;
+
+                if (!subject || !message) {
+                    alert("Please fill in both Subject and Message.");
+                    return;
+                }
+
+                try {
+                    const res = await fetch('/api/support/create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ subject: subject, message: message })
+                    });
+
+                    if (res.ok) {
+                        alert("Message sent! Our team will review it shortly.");
+                        closeSupportModal();
+                        subjectInput.value = '';
+                        messageInput.value = '';
+                    } else {
+                        alert("Failed to send message. Please try again.");
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert("Error connecting to server.");
+                }
+            }
+        </script>
+
+        <!-- GLOBAL LOCATION MODAL -->
+        <!-- GLOBAL LOCATION MODAL -->
+        <div id="locationModal" class="location-modal-overlay" th:classappend="${locationMissing} ? 'active'"
+            style="display:none;"> <!-- Inline style for backup, removed by class if active? No, wait. -->
+            <!-- Correction: If I use display:none inline, class active { display:flex !important } overrides it. This is good. -->
+            <div
+                style="background:var(--card-bg); padding:40px; border-radius:24px; max-width:800px; width:95%; text-align:center; border:1px solid var(--glass-border); box-shadow:var(--shadow-premium); max-height:90vh; overflow-y:auto;">
+                <h2 style="color:white; margin-bottom:10px; font-size:2rem;">Select Your Location</h2>
+                <p style="color:var(--text-secondary); margin-bottom:30px;">Discover the best theaters near you.</p>
+
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:15px;">
+                    <div onclick="selectCity('Mumbai')" class="city-card">
+                        <div class="city-icon">🏝️</div>
+                        <div class="city-name">Mumbai</div>
+                    </div>
+                    <div onclick="selectCity('Delhi')" class="city-card">
+                        <div class="city-icon">🏛️</div>
+                        <div class="city-name">Delhi</div>
+                    </div>
+                    <div onclick="selectCity('Bangalore')" class="city-card">
+                        <div class="city-icon">🌳</div>
+                        <div class="city-name">Bangalore</div>
+                    </div>
+                    <div onclick="selectCity('Hyderabad')" class="city-card">
+                        <div class="city-icon">🏰</div>
+                        <div class="city-name">Hyderabad</div>
+                    </div>
+                    <div onclick="selectCity('Ahmedabad')" class="city-card">
+                        <div class="city-icon">🪁</div>
+                        <div class="city-name">Ahmedabad</div>
+                    </div>
+                    <div onclick="selectCity('Chennai')" class="city-card">
+                        <div class="city-icon">🌊</div>
+                        <div class="city-name">Chennai</div>
+                    </div>
+                    <div onclick="selectCity('Kolkata')" class="city-card">
+                        <div class="city-icon">🚋</div>
+                        <div class="city-name">Kolkata</div>
+                    </div>
+                    <div onclick="selectCity('Pune')" class="city-card">
+                        <div class="city-icon">🎓</div>
+                        <div class="city-name">Pune</div>
+                    </div>
+                    <div onclick="selectCity('Jaipur')" class="city-card">
+                        <div class="city-icon">🏰</div>
+                        <div class="city-name">Jaipur</div>
+                    </div>
+                    <div onclick="selectCity('Surat')" class="city-card">
+                        <div class="city-icon">💎</div>
+                        <div class="city-name">Surat</div>
+                    </div>
+                    <div onclick="selectCity('Lucknow')" class="city-card">
+                        <div class="city-icon">🕌</div>
+                        <div class="city-name">Lucknow</div>
+                    </div>
+                    <div onclick="selectCity('Kanpur')" class="city-card">
+                        <div class="city-icon">🏭</div>
+                        <div class="city-name">Kanpur</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .city-card {
+                background: rgba(255, 255, 255, 0.05);
+                padding: 15px;
+                border-radius: 15px;
+                cursor: pointer;
+                border: 1px solid transparent;
+                transition: 0.3s;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                aspect-ratio: 1/1;
+            }
+
+            .city-card:hover {
+                background: var(--accent-color) !important;
+                color: black !important;
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            }
+
+            .city-icon {
+                font-size: 2rem;
+                margin-bottom: 8px;
+            }
+
+            .city-name {
+                font-weight: bold;
+                font-size: 0.95rem;
+            }
+
+            .location-modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                backdrop-filter: blur(15px);
+                z-index: 99999;
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s;
+            }
+
+            .location-modal-overlay.active {
+                display: flex !important;
+            }
+        </style>
+
+        <script>
+            // --- Support Modal Logic ---
+            function openSupportModal(e) {
+                if (e) e.preventDefault();
+                document.getElementById('supportModal').style.display = 'flex';
+            }
+            function closeSupportModal() {
+                document.getElementById('supportModal').style.display = 'none';
+            }
+
+            // --- Location Global Logic ---
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            }
+
+            function selectCity(city) {
+                document.cookie = `city=${city}; path=/`; // Session cookie only (ask every time browser closes)
+                location.reload();
+            }
+
+            function openLocationModal() {
+                document.getElementById('locationModal').classList.add('active');
+            }
+
+            function checkGlobalLocation() {
+                const city = getCookie('city');
+                const modal = document.getElementById('locationModal');
+
+                if (!modal) return;
+
+                // Sync: If cookie exists, we do NOTHING. We do NOT remove class 'active'
+                // because specific pages (like movie-details) might FORCE it open.
+
+                if (modal.classList.contains('active')) {
+                    console.log("Server side or manual JS forced modal (active class) - keeping open");
+                    return;
+                }
+
+                // GLOBAL AUTO-OPEN REMOVED PER USER REQUEST
+                // We only want to auto-open on specific pages (like movie-details), not everywhere.
+                /*
+                if (!city || city.trim() === '') {
+                    console.log("No city found, adding active class");
+                    modal.classList.add('active');
+                }
+                */
+            }
+
+            // Run on load everywhere
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkGlobalLocation);
+            } else {
+                checkGlobalLocation();
+            }
+
+            // --- Window Close Events ---
+            window.onclick = function (event) {
+                const sModal = document.getElementById('supportModal');
+                if (event.target == sModal) sModal.style.display = "none";
+
+                const lModal = document.getElementById('locationModal');
+                if (event.target == lModal) {
+                    const city = getCookie('city');
+                    if (city && city.trim() !== '') {
+                        lModal.classList.remove('active');
+                        lModal.style.display = 'none';
+                    } else {
+                        // STRICT ENFORCEMENT: Do nothing.
+                        // The user MUST pick a city. Clicking outside is ignored.
+                        console.log("Blocking close - City selection is mandatory.");
+                    }
+                }
+            }
+        </script>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments :: navbar}"></div>
+
+    <div class="container" style="margin-top: 120px; max-width: 600px;">
+        <h1 class="section-title">My Wallet</h1>
+        <div
+            style="background: var(--card-bg); padding: 40px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-premium); text-align: center;">
+            <i class="fas fa-wallet" style="font-size: 4rem; color: var(--accent-color); margin-bottom: 20px;"></i>
+            <h2 style="color: var(--text-secondary); font-weight: 400;">Current Balance</h2>
+            <div style="font-size: 3.5rem; font-weight: 800; color: white; margin: 10px 0;">
+                ₹<span th:text="${#numbers.formatDecimal(user.walletBalance, 1, 2)}">0.00</span>
+            </div>
+
+            <div
+                style="margin-top: 40px; background: rgba(255,255,255,0.03); padding: 30px; border-radius: 20px; border: 1px solid var(--glass-border);">
+                <h3 style="margin-bottom: 20px;">Add Money</h3>
+                <form action="/wallet/add" method="post" style="display: flex; gap: 10px;">
+                    <input type="number" name="amount" placeholder="Enter amount" required min="1"
+                        style="flex: 1; padding: 15px; background: var(--bg-color); color: white; border: 1px solid var(--glass-border); border-radius: 12px; outline: none;">
+                    <button type="submit" class="btn-primary" style="margin: 0; padding: 0 30px;">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments :: bottom-nav}"></div>
+    <div th:replace="~{fragments :: footer}"></div>
+</body>
+
+</html>

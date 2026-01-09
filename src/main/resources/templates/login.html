@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments :: navbar}"></div>
+    <div class="hero" style="height: 100vh;">
+        <div style="background:rgba(0,0,0,0.8); padding:40px; border-radius:15px; width:400px;">
+            <h2 style="margin-bottom:20px; color:var(--accent-color);">Login</h2>
+
+            <div th:if="${error}"
+                style="background:#e74c3c; color:white; padding:10px; border-radius:5px; margin-bottom:15px; text-align:center;">
+                <span th:text="${error}"></span>
+            </div>
+
+            <form action="/login" method="post">
+                <input type="email" name="email" placeholder="Email" required
+                    style="width:100%; padding:15px; margin-bottom:15px; border:none; border-radius:5px;">
+                <input type="password" name="password" placeholder="Password" required
+                    style="width:100%; padding:15px; margin-bottom:15px; border:none; border-radius:5px;">
+                <button class="btn-primary" style="width:100%; margin-top:0;">Login</button>
+            </form>
+            <p style="margin-top:15px; text-align:center;"><a href="/register">Create Account</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

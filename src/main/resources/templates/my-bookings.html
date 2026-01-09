@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments :: navbar}"></div>
+    <div class="container" style="margin-top: 100px; min-height: 60vh;">
+        <h2 class="section-title">My Tickets</h2>
+        <div th:each="b : ${bookings}" class="ticket-view">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px dashed black; padding-bottom: 10px; margin-bottom: 10px;">
+                <h3 th:text="${b.showtime.movie.title}" style="margin:0;">Movie</h3>
+                <span th:text="${b.status}"
+                    th:style="${b.status=='CANCELLED' ? 'color:red' : 'color:green'}">Status</span>
+            </div>
+            <div style="display:flex; gap:20px;">
+                <div style="flex:1;">
+                    <p>Time: <b th:text="${b.showtime.formattedTime}"></b></p>
+                    <p>Seats: <b th:text="${b.seatNumbers}"></b></p>
+                    <p>Screen: <span th:text="${b.showtime.screenName}"></span></p>
+                </div>
+                <!-- HIDE QR IF CANCELLED -->
+                <img th:if="${b.status != 'CANCELLED'}"
+                    th:src="'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + ${b.qrCode}">
+            </div>
+            <hr>
+            <div style="text-align:right;">
+                <p>Total: <b>₹<span th:text="${b.totalPrice}"></span></b></p>
+                <button onclick="window.print()" class="btn-primary"
+                    style="padding:5px 15px; font-size:0.8rem; margin-top:5px;">Print</button>
+
+                <button th:if="${b.status == 'BOOKED'}"
+                    th:attr="onclick='cancel(' + ${b.id} + ', ' + ${b.totalPrice} + ')'" class="btn-primary"
+                    style="background:#c0392b; color:white; padding:5px 15px; font-size:0.8rem;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function cancel(id, amount) {
+            if (confirm("Are you sure you want to cancel this ticket?")) {
+                alert("Refund Initiated!\nAmount of ₹" + amount + " will be credited to your wallet.");
+                fetch('/api/bookings/' + id + '/cancel', { method: 'POST' }).then(r => location.reload());
+            }
+        }
+    </script>
+    <div th:replace="~{fragments :: bottom-nav}"></div>
+    <div th:replace="~{fragments :: footer}"></div>
+</body>
+
+</html>

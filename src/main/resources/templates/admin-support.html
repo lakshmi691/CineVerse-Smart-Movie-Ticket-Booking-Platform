@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Support Inbox - Cineverse Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body style="padding-top: 80px;">
+
+    <div th:replace="~{fragments :: navbar}"></div>
+
+    <div class="container" style="max-width: 1200px; margin-top: 50px;">
+        <div style="margin-bottom: 30px;">
+            <h1 class="section-title" style="margin: 0;">Support Inbox</h1>
+        </div>
+
+        <div
+            style="background: var(--card-bg); border-radius: 20px; border: 1px solid var(--glass-border); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; color: white;">
+                <thead>
+                    <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                        <th style="padding: 20px;">ID</th>
+                        <th style="padding: 20px;">User</th>
+                        <th style="padding: 20px;">Subject & Message</th>
+                        <th style="padding: 20px;">Date</th>
+                        <th style="padding: 20px;">Status</th>
+                        <th style="padding: 20px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ticket : ${tickets}" style="border-bottom: 1px solid var(--glass-border);">
+                        <td style="padding: 20px; opacity: 0.7;">#<span th:text="${ticket.id}"></span></td>
+                        <td style="padding: 20px;">
+                            <div style="font-weight: bold;" th:text="${ticket.userEmail}">user@example.com</div>
+                        </td>
+                        <td style="padding: 20px; max-width: 400px;">
+                            <div style="color: var(--accent-color); font-weight: bold; margin-bottom: 5px;"
+                                th:text="${ticket.subject}">Subject</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;" th:text="${ticket.message}">Message content...
+                            </div>
+                        </td>
+                        <td style="padding: 20px; opacity: 0.7;"
+                            th:text="${#temporals.format(ticket.createdAt, 'dd MMM HH:mm')}">Date</td>
+                        <td style="padding: 20px;">
+                            <span th:if="${ticket.status == 'OPEN'}"
+                                style="background: rgba(46, 204, 113, 0.2); color: #2ecc71; padding: 5px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">OPEN</span>
+                            <span th:if="${ticket.status == 'CLOSED'}"
+                                style="background: rgba(255, 255, 255, 0.1); color: #aaa; padding: 5px 10px; border-radius: 10px; font-size: 0.8rem;">CLOSED</span>
+                        </td>
+                        <td style="padding: 20px;">
+                            <form th:if="${ticket.status == 'OPEN'}"
+                                th:action="@{/admin/support/close/{id}(id=${ticket.id})}" method="post">
+                                <button type="submit" class="btn-primary"
+                                    style="padding: 5px 15px; font-size: 0.8rem; background: var(--accent-color); color: black;">
+                                    <i class="fas fa-check"></i> Close
+                                </button>
+                            </form>
+                            <span th:if="${ticket.status == 'CLOSED'}" style="opacity: 0.5;">Resolved</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(tickets)}">
+                        <td colspan="6" style="padding: 40px; text-align: center; opacity: 0.7;">No active support
+                            tickets.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin:40px 0 20px 0; text-align: left;">
+            <a href="/admin" class="btn-primary" style="background:#666; margin:0;">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments :: footer}"></div>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments :: navbar}"></div>
+
+    <div class="container" style="margin-top:40px;">
+        <h1>User Management</h1>
+
+        <table style="width:100%; border-collapse:collapse; margin:20px 0;">
+            <thead>
+                <tr style="background:var(--card-bg); text-align:left;">
+                    <th style="padding:15px;">ID</th>
+                    <th style="padding:15px;">Name</th>
+                    <th style="padding:15px;">Email</th>
+                    <th style="padding:15px;">Mobile</th>
+                    <th style="padding:15px;">Role</th>
+                    <th style="padding:15px;">Wallet</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}" style="border-bottom:1px solid #333;">
+                    <td style="padding:15px;" th:text="${user.id}">1</td>
+                    <td style="padding:15px;" th:text="${user.name}">John Doe</td>
+                    <td style="padding:15px;" th:text="${user.email}">email@example.com</td>
+                    <td style="padding:15px;" th:text="${user.mobile}">1234567890</td>
+                    <td style="padding:15px;">
+                        <span th:text="${user.role}"
+                            th:style="${user.role == 'ADMIN' ? 'color:var(--accent-color); font-weight:bold;' : ''}">
+                            USER
+                        </span>
+                    </td>
+                    <td style="padding:15px;" th:text="'₹' + ${user.walletBalance}">₹0</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin:40px 0 20px 0; text-align: left;">
+            <a href="/admin" class="btn-primary" style="background:#666; margin:0;">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments :: footer}"></div>
+</body>
+
+</html>

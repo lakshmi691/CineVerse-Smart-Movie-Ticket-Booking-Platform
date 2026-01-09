@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments :: navbar}"></div>
+    <header class="hero">
+        <h1 style="text-transform: uppercase;">CINEMA REDEFINED</h1>
+        <p>Experience movies in UltraMax Quality.</p>
+        <button class="btn-primary"
+            onclick="window.scrollTo({top: document.getElementById('movies').offsetTop - 100, behavior: 'smooth'})">Get
+            Tickets</button>
+    </header>
+
+    <div class="container" id="movies">
+        <!-- Recommendations Section -->
+        <div th:if="${recommendations != null}" style="margin-bottom: 40px;">
+            <h2 class="section-title">Recommended For You <span th:if="${recommendedGenre}"
+                    th:text="'(' + ${recommendedGenre} + ')'"
+                    style="font-size: 0.6em; color: var(--accent-color); vertical-align: middle;"></span></h2>
+            <div class="movie-grid">
+                <div th:each="movie : ${recommendations}" class="movie-card"
+                    th:onclick="'window.location.href=\'/movie/' + ${movie.id} + '\''">
+                    <div class="card-media">
+                        <div class="rating-badge" th:text="${movie.rating}">4.5</div>
+                        <div class="genre-badge" th:text="${movie.genre}">Genre</div>
+                        <img th:src="${movie.imageUrl}" th:alt="${movie.title}" class="movie-poster">
+                    </div>
+                    <div class="movie-info">
+                        <h3 th:text="${movie.title}">Movie Title</h3>
+                        <div class="movie-meta">
+                            <span th:text="${movie.durationMin} + ' min'">120 min</span>
+                            <span class="price-tag">₹<span th:text="${movie.price}"></span></span>
+                        </div>
+                        <div class="card-action">
+                            <button class="btn-card">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Now Streaming</h2>
+
+        <!-- Search and Filter Section -->
+        <div
+            style="background:var(--card-bg); padding:30px; border-radius:30px; margin-bottom:50px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-premium);">
+            <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
+                <div style="flex:1; min-width:300px; position:relative; display: flex; gap: 10px;">
+                    <div style="position: relative; flex: 1;">
+                        <i class="fas fa-search"
+                            style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--accent-color);"></i>
+                        <input type="text" id="searchInput" placeholder="Search for your favorite movies..."
+                            style="width:100%; padding:15px 15px 15px 45px; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--glass-border); border-radius:15px; outline:none; transition:0.3s;"
+                            onkeyup="handleSearch(event)">
+                    </div>
+                    <button onclick="applyFilters()" class="btn-primary"
+                        style="margin: 0; border-radius: 12px; padding: 0 25px;">Search</button>
+                </div>
+
+                <div style="display:flex; gap:15px;">
+                    <select id="genreFilter" onchange="applyFilters()" class="filter-select">
+                        <option value="">All Genres</option>
+                        <option th:each="g : ${genres}" th:value="${g}" th:text="${g}">
+                        </option>
+                    </select>
+
+                    <select id="sortBy" onchange="applyFilters()" class="filter-select">
+                        <option value="">Sort By</option>
+                        <option value="rating">Rating (High to Low)</option>
+                        <option value="price">Price (Low to High)</option>
+                        <option value="popularity">Popularity</option>
+                    </select>
+                </div>
+
+                <button onclick="resetFilters()" class="btn-primary"
+                    style="margin:0; padding:12px 25px; background:#333; color:#ccc; border-radius:12px;">Reset</button>
+            </div>
+        </div>
+
+        <div class="movie-grid">
+            <div th:each="movie : ${movies}" class="movie-card"
+                th:onclick="'window.location.href=\'/movie/' + ${movie.id} + '\''" style="position: relative;">
+
+                <!-- WATCHLIST HEART ICON -->
+                <div th:if="${session.user != null}" style="position: absolute; top: 10px; right: 10px; z-index: 10;"
+                    onclick="event.stopPropagation()">
+                    <a th:if="${userWatchlist != null and #lists.contains(userWatchlist, movie.id)}"
+                        th:href="@{'/watchlist/remove/' + ${movie.id}}" title="Remove from Watchlist">
+                        <i class="fas fa-heart"
+                            style="color: #ff4d4d; font-size: 1.5rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));"></i>
+                    </a>
+                    <a th:if="${userWatchlist == null or !#lists.contains(userWatchlist, movie.id)}"
+                        th:href="@{'/watchlist/add/' + ${movie.id}}" title="Add to Watchlist">
+                        <i class="far fa-heart"
+                            style="color: white; font-size: 1.5rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));"></i>
+                    </a>
+                </div>
+
+                <div class="card-media">
+                    <div class="rating-badge" th:text="${movie.rating}">4.5</div>
+                    <div class="genre-badge" th:text="${movie.genre}">Genre</div>
+                    <img th:src="${movie.imageUrl}" th:alt="${movie.title}" class="movie-poster"
+                        referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/500x750?text=Poster'; this.onerror=null;">
+                </div>
+                <div class="movie-info">
+                    <h3 th:text="${movie.title}">Movie Title</h3>
+                    <div class="movie-meta">
+                        <span th:text="${movie.durationMin} + ' min'">120 min</span>
+                        <span class="price-tag">₹<span th:text="${movie.price}"></span></span>
+                    </div>
+                    <div class="card-action">
+                        <button class="btn-card">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Movies Section -->
+        <h2 class="section-title" style="margin-top: 60px;">Upcoming Movies</h2>
+        <div class="movie-grid">
+            <div th:each="movie : ${upcomingMovies}" class="movie-card" style="opacity: 1; cursor: default;">
+                <div class="card-media">
+                    <div class="rating-badge" style="background:var(--accent-color); color: black; border:none;">COMING
+                        SOON</div>
+                    <div class="genre-badge" th:text="${movie.genre}">Genre</div>
+                    <img th:src="${movie.imageUrl}" th:alt="${movie.title}" class="movie-poster"
+                        referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/500x750?text=Coming+Soon'; this.onerror=null;">
+                </div>
+                <div class="movie-info">
+                    <h3 th:text="${movie.title}">Movie Title</h3>
+                    <div class="movie-meta">
+                        <span th:text="'Releasing: ' + ${movie.releaseDate}">Date</span>
+                    </div>
+                    <div class="card-action" style="opacity: 1; transform: none;">
+                        <button class="btn-card" style="background: #333; color: #888; cursor: default;" disabled>Stay
+                            Tuned</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                applyFilters();
+            }
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value;
+            const genre = document.getElementById('genreFilter').value;
+            const sort = document.getElementById('sortBy').value;
+
+            let url = '/?';
+            if (search) url += 'search=' + encodeURIComponent(search) + '&';
+            if (genre) url += 'genre=' + encodeURIComponent(genre) + '&';
+            if (sort) url += 'sort=' + sort;
+
+            window.location.href = url;
+        }
+
+        function resetFilters() {
+            window.location.href = '/';
+        }
+
+        // Set current values from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('search')) document.getElementById('searchInput').value = urlParams.get('search');
+        if (urlParams.get('genre')) document.getElementById('genreFilter').value = urlParams.get('genre');
+        if (urlParams.get('sort')) document.getElementById('sortBy').value = urlParams.get('sort');
+    </script>
+
+    <div th:replace="~{fragments :: bottom-nav}"></div>
+    <div th:replace="~{fragments :: footer}"></div>
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head}"></head>
+
+<body>
+    <div th:replace="~{fragments :: navbar}"></div>
+
+    <div class="container" style="margin-top:40px;">
+        <h1>Review Moderation</h1>
+
+        <h2 style="margin-top:40px;">All Reviews</h2>
+        <div style="margin:20px 0;">
+            <div th:each="review : ${allReviews}"
+                style="background:var(--card-bg); padding:20px; border-radius:10px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:start;">
+                <div style="flex:1;">
+                    <strong th:text="${review.user.name}">User</strong>
+                    <span style="color:gold; margin:0 10px;">★</span>
+                    <span th:text="${review.rating}">5</span>
+                    <p style="margin:10px 0; color:var(--text-secondary);" th:text="${review.movie.title}">Movie</p>
+                    <p th:text="${review.reviewText}">Review text</p>
+                </div>
+                <div style="display:flex; gap:10px;" th:if="${review.moderationStatus == 'PENDING'}">
+                    <button onclick="moderateReview(this, 'approve')" th:attr="data-review-id=${review.id}"
+                        class="btn-primary" style="background:#43e97b; margin:0;">Approve</button>
+                    <button onclick="moderateReview(this, 'reject')" th:attr="data-review-id=${review.id}"
+                        class="btn-primary" style="background:#f5576c; margin:0;">Reject</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin:40px 0 20px 0; text-align: left;">
+            <a href="/admin" class="btn-primary" style="background:#666; margin:0;">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        async function moderateReview(button, action) {
+            const reviewId = button.getAttribute('data-review-id');
+            try {
+                const response = await fetch(`/admin/reviews/${reviewId}/${action}`, {
+                    method: 'POST'
+                });
+                if (response.ok) {
+                    alert(`Review ${action}d successfully!`);
+                    location.reload();
+                } else {
+                    alert('Failed to moderate review');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error moderating review');
+            }
+        }
+    </script>
+
+    <div th:replace="~{fragments :: footer}"></div>
+</body>
+
+</html>
